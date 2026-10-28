@@ -107,7 +107,7 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){window.
     setMode(false); password.focus();
   }
   async function fetchCloudRows() {
-    const {data, error} = await client.from('workhours').select('id,work_date,data').eq('user_id', currentUser.id);
+    const {data, error} = await client.from('work_hours').select('id,work_date,data').eq('user_id', currentUser.id);
     if (error) throw error;
     return data || [];
   }
@@ -122,17 +122,17 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){window.
       for (const [date, record] of Object.entries(local)) {
         const existing = byDate.get(date);
         if (existing) {
-          const {error: e} = await client.from('workhours').update({data: record}).eq('id', existing.id).eq('user_id', currentUser.id);
+          const {error: e} = await client.from('work_hours').update({data: record}).eq('id', existing.id).eq('user_id', currentUser.id);
           if (e) throw e;
         } else {
-          const {error: e} = await client.from('workhours').insert({user_id: currentUser.id, work_date: date, data: record});
+          const {error: e} = await client.from('work_hours').insert({user_id: currentUser.id, work_date: date, data: record});
           if (e) throw e;
         }
       }
       const localDates = new Set(Object.keys(local));
       const deleteIds = rows.filter(r => !localDates.has(r.work_date)).map(r => r.id);
       if (deleteIds.length) {
-        const {error: e} = await client.from('workhours').delete().eq('user_id', currentUser.id).in('id', deleteIds);
+        const {error: e} = await client.from('work_hours').delete().eq('user_id', currentUser.id).in('id', deleteIds);
         if (e) throw e;
       }
       setStatus('Të dhënat u ruajtën në databazë');
